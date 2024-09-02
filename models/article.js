@@ -1,19 +1,32 @@
-// This code defines a basic Article schema with two fields:
-// 1. author: A string that is required and stores the author's name.
-// 2. text: A string that is required and stores the content of the article.
-
-
-const mongoose = require('mongoose');
-
-// Define the schema for an Article
-const articleSchema = new mongoose.Schema({
-    author: { type: String, required: true },
-    text: { type: String, required: true }
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
 });
-
-// Create the Article model from the schema
-// This line creates a Mongoose model named Article using the articleSchema defined earlier.
-const Article = mongoose.model('Article', articleSchema);
-
-// This line exports the Article model so it can be used in other parts of the application
-module.exports = Article;
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Article = void 0;
+const mongoose_1 = __importStar(require("mongoose"));
+const ArticleSchema = new mongoose_1.Schema({
+    author: { type: String, required: true },
+    text: { type: String, required: true },
+});
+exports.Article = mongoose_1.default.model('Article', ArticleSchema);
