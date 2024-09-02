@@ -14,6 +14,7 @@ const Article = require('./models/article');  // Import the Article model
 
 
 // initiates a connection to a MongoDB database using the Mongoose library.
+//todo - change the environment to be a cloud environment
 mongoose.connect('mongodb://localhost:27017/mydatabase', {
 }).then(() => {
     console.log('Connected to MongoDB');
@@ -53,8 +54,6 @@ app.get('/articles/search', async (req, res) => {
     }
 
     try {
-        console.log(`Searching for word: ${word}`);
-
         // Find articles where the text field contains a match for the case-insensitive word
         const articles = await Article.find({ text: { $regex: word, $options: 'i' } });
 
@@ -76,11 +75,9 @@ app.get('/articles/search', async (req, res) => {
 
         });
 
-        // Send the compact JSON response
-        res.send({
-            word: word,
-            locations: results
-        });
+        // Custom formatted string response
+        const response = `{word: ${word}, locations: [${results.join(', ')}]}`;
+        res.send(response);
     } catch (error) {
         console.error('Error searching for word in articles:', error);
         res.status(500).send('Error searching for word in articles');
@@ -88,7 +85,7 @@ app.get('/articles/search', async (req, res) => {
 });
 
 // Route to get an article by ID
-app.get('/articles/:id', async (req, res) => {
+app.get('/articles/getById/:id', async (req, res) => {
     try {
         const article = await Article.findById(req.params.id);
         if (!article) {
