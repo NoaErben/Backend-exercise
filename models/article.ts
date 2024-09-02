@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IArticle extends Document {
-    _id: mongoose.Types.ObjectId;
+    // _id: mongoose.Types.ObjectId;
     author: string;
     text: string;
 }
@@ -12,4 +12,5 @@ const ArticleSchema: Schema = new Schema({
 });
 
 export const Article = mongoose.model<IArticle>('Article', ArticleSchema);
+
 
