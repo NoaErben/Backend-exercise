@@ -15,8 +15,6 @@ const Article = require('./models/article');  // Import the Article model
 
 // initiates a connection to a MongoDB database using the Mongoose library.
 mongoose.connect('mongodb://localhost:27017/mydatabase', {
-    useNewUrlParser: true, //  This option tells Mongoose to use the new MongoDB connection string parser, which is more robust and handles various edge cases better.
-    useUnifiedTopology: true // This option opts in to using the new MongoDB driver’s unified topology layer, which improves connection handling and stability.
 }).then(() => {
     console.log('Connected to MongoDB');
 }).catch((err) => {
@@ -47,6 +45,43 @@ app.post('/articles', async (req, res) => {
     }
 });
 
+// Express Route to find a word in articles
+app.get('/articles/search', async (req, res) => {
+    const word = req.query.word;
+    if (!word) {
+        return res.status(400).send('Word query parameter is required');
+    }
+
+    try {
+        console.log(`Searching for word: ${word}`);
+
+        // Find articles where the text field contains a match for the case-insensitive word
+        const articles = await Article.find({ text: { $regex: word, $options: 'i' } });
+
+        if (!articles || !Array.isArray(articles)) {
+            return res.status(500).send('Unexpected error: articles is not an array');
+        }
+
+        // Iterate over each article to find all occurrences of the word
+        const results = articles.map(article => {
+            const offsets = [];
+            const regex = new RegExp(word, 'gi'); // Case-insensitive and global search
+            let match;
+
+            while ((match = regex.exec(article.text)) !== null) {
+                offsets.push(match.index); // Store the start index of each match
+            }
+
+            return { article_id: article._id, offsets };
+        });
+
+        res.send({ word, locations: results });
+    } catch (error) {
+        console.error('Error searching for word in articles:', error);
+        res.status(500).send('Error searching for word in articles');
+    }
+});
+
 // Route to get an article by ID
 app.get('/articles/:id', async (req, res) => {
     try {
@@ -60,39 +95,8 @@ app.get('/articles/:id', async (req, res) => {
     }
 });
 
-// Express Route to find a word in articles
-app.get('/articles/search', async (req, res) => {
-    const word = req.query.word;
-    if (!word) {
-        return res.status(400).send('Word query parameter is required');
-    }
 
-    // The i flag makes the search case-insensitive
-    try {
-        console.log(`Searching for word: ${word}`);
 
-        //It tells MongoDB: "Find all articles where the text field contains
-        // a match for the regular expression created by new RegExp(word, 'i')."
-        const articles = await Article.find({ text: { $regex: word, $options: 'i' } }, {}, {});
-        console.log(`Found articles: ${articles.length}`);
-
-        // the function iterates over each article in the articles array
-        const results = articles.map(article => {
-            const offsets = []; // an empty array to store the starting positions (offsets) of all occurrences of the word within the article's text.
-            let idx = article.text.indexOf(word);
-            while (idx !== -1) {
-                offsets.push(idx); //  Stores the index where the word is found in the offsets array.
-                idx = article.text.indexOf(word, idx + 1); // Updates the index to the next occurrence of the word by starting the search just after the current occurrence.
-            }
-            return { article_id: article._id, offsets }; //  For each article, the map() function returns an object containing article_id, offsets
-
-        });
-
-        res.send({ word, locations: results }); // the server sends a response back to the client
-    } catch (error) {
-        res.status(500).send('Error searching for word in articles');
-    }
-});
 
 
 
