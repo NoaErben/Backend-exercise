@@ -72,10 +72,14 @@ app.get('/articles/search', async (req, res) => {
                 offsets.push(match.index); // Store the start index of each match
             }
 
-            return { article_id: article._id, offsets };
+            return { article_id: article._id.toString(), offsets };
         });
 
-        res.send({ word, locations: results });
+        // Send the compact JSON response
+        res.send({
+            word: word,
+            locations: results
+        });
     } catch (error) {
         console.error('Error searching for word in articles:', error);
         res.status(500).send('Error searching for word in articles');
