@@ -7,10 +7,7 @@ const Article = require('./models/article');  // Import the Article model
 const uri = "mongodb+srv://noaerben:Noa%402801@noaserver.pg72a.mongodb.net/?retryWrites=true&w=majority&appName=noaserver";
 
 // Connect to MongoDB Atlas using Mongoose
-mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
+mongoose.connect(uri)
     .then(() => {
         console.log('Connected to MongoDB Atlas');
     })
@@ -48,7 +45,7 @@ app.get('/articles/search', async (req, res) => {
     }
 
     try {
-        const articles = await Article.find({ text: { $regex: word, $options: 'i' } });
+        const articles = await Article.find({ text: { $regex: word } });
 
         if (!articles || !Array.isArray(articles)) {
             return res.status(500).send('Unexpected error: articles is not an array');
@@ -56,7 +53,7 @@ app.get('/articles/search', async (req, res) => {
 
         const results = articles.map(article => {
             const offsets = [];
-            const regex = new RegExp(word, 'gi');
+            const regex = new RegExp(word, 'g');  // Remove 'i' to make case-sensitive
             let match;
 
             while ((match = regex.exec(article.text)) !== null) {
@@ -66,7 +63,11 @@ app.get('/articles/search', async (req, res) => {
             return `{article_id: ${article._id.toString()}, offsets: [${offsets.join(', ')}]}`;
         });
 
-        const response = `{word: ${word}, locations: [${results.join(', ')}]}`;
+        // Construct the response string with proper formatting
+        const response = `{
+word: "${word}",
+locations: [${results.join(', ')}]
+}`;
         res.send(response);
     } catch (error) {
         console.error('Error searching for word in articles:', error);
