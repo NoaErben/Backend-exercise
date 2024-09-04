@@ -52,8 +52,13 @@ export const findWordsInArticles = async (req: Request, res: Response) => {
                 offsets.push(match.index);
             }
 
-            // todo - json!
-            return `{article_id: ${(article._id as mongoose.Types.ObjectId).toString()}, offsets:[${offsets.join(', ')}]}`;
+            // return `{article_id: ${(article._id as mongoose.Types.ObjectId).toString()}, offsets:[${offsets.join(', ')}]}`;
+
+            // Return a JSON object
+            return {
+                article_id: (article._id as mongoose.Types.ObjectId).toString(),
+                offsets: offsets
+            };
         });
 
         res.status(200).json(results);

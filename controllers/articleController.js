@@ -56,8 +56,13 @@ const findWordsInArticles = (req, res) => __awaiter(void 0, void 0, void 0, func
             while ((match = regex.exec(article.text)) !== null) {
                 offsets.push(match.index);
             }
-            // todo - json!
-            return `{article_id: ${article._id.toString()}, offsets:[${offsets.join(', ')}]}`;
+            // // todo - json!
+            // return `{article_id: ${(article._id as mongoose.Types.ObjectId).toString()}, offsets:[${offsets.join(', ')}]}`;
+            // Return a JSON object
+            return {
+                article_id: article._id.toString(),
+                offsets: offsets
+            };
         });
         res.status(200).json(results);
     }
