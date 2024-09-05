@@ -15,15 +15,15 @@ const article_1 = require("../models/article");
 const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newArticle = new article_1.Article(req.body);
-        const savedArticle = yield newArticle.save();
-        res.status(201).json(savedArticle);
+        yield newArticle.save();
+        res.status(201).send("article saved successfully");
     }
     catch (error) {
-        res.status(500).json({ message: 'Error creating article', error });
+        res.send(`error: ${error}`);
     }
 });
 exports.createArticle = createArticle;
-// Get an article by ID
+// Get an article by IDß
 const getArticleById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const article = yield article_1.Article.findById(req.params.id);
@@ -56,7 +56,6 @@ const findWordsInArticles = (req, res) => __awaiter(void 0, void 0, void 0, func
             while ((match = regex.exec(article.text)) !== null) {
                 offsets.push(match.index);
             }
-            // // todo - json!
             // return `{article_id: ${(article._id as mongoose.Types.ObjectId).toString()}, offsets:[${offsets.join(', ')}]}`;
             // Return a JSON object
             return {

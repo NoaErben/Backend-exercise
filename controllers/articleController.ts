@@ -7,14 +7,14 @@ import mongoose, {Document, FilterQuery} from 'mongoose';
 export const createArticle = async (req: Request, res: Response) => {
     try {
         const newArticle = new Article(req.body);
-        const savedArticle = await newArticle.save();
-        res.status(201).json(savedArticle);
+        await newArticle.save();
+        res.status(201).send("article saved successfully");
     } catch (error) {
-        res.status(500).json({ message: 'Error creating article', error });
+        res.send(`error: ${error}`);
     }
 };
 
-// Get an article by ID
+// Get an article by IDß
 export const getArticleById = async (req: Request, res: Response) => {
     try {
         const article = await Article.findById(req.params.id) as IArticle | null;
