@@ -16,7 +16,13 @@ const port = process.env.PORT || 3000;
 app.use(express_1.default.json());
 app.use(logTenantId_1.logTenantId);
 // MongoDB Atlas connection URI
-const uri = "mongodb+srv://noaerben:Noa%402801@noaserver.pg72a.mongodb.net/?retryWrites=true&w=majority&appName=noaserver";
+// MongoDB Atlas connection URI from environment variables
+const uri = process.env.MONGODB_URI || '';
+// Check if the URI is provided
+if (!uri) {
+    console.error('MongoDB URI is not set in environment variables');
+    process.exit(1); // Exit the process if the URI is not set
+}
 // Connect to MongoDB Atlas using Mongoose
 mongoose_1.default.connect(uri)
     .then(() => {
