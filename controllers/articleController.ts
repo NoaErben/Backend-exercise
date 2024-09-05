@@ -14,7 +14,7 @@ export const createArticle = async (req: Request, res: Response) => {
     }
 };
 
-// Get an article by IDß
+// Get an article by ID
 export const getArticleById = async (req: Request, res: Response) => {
     try {
         const article = await Article.findById(req.params.id) as IArticle | null;

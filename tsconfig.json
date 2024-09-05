@@ -3,7 +3,7 @@
     "target": "es2016",
     "module": "commonjs",
     "outDir": "./dist",  // Ensures that the compiled files are output in the "dist" directory
-    "rootDir": "./",  // Specifies the root directory of your TypeScript files
+    "rootDir": "./",  // Specifies the root directory of the TypeScript files
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

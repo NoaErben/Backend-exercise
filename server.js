@@ -5,9 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = require("dotenv");
-const articleRoutes_1 = __importDefault(require("../routes/articleRoutes"));
-const logTenantId_1 = require("../middleware/logTenantId");
-const db_1 = require("./db"); // Extracted MongoDB connection logic
+const articleRoutes_1 = __importDefault(require("./routes/articleRoutes"));
+const logTenantId_1 = require("./middleware/logTenantId");
+const db_1 = require("./utils/db"); // Extracted MongoDB connection logic
 // Load environment variables from .env file
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
