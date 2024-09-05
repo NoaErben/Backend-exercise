@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const mongoose_1 = __importDefault(require("mongoose"));
 const dotenv_1 = require("dotenv");
-const articleRoutes_1 = __importDefault(require("./routes/articleRoutes"));
-const logTenantId_1 = require("./middleware/logTenantId");
+const articleRoutes_1 = __importDefault(require("../routes/articleRoutes"));
+const logTenantId_1 = require("../middleware/logTenantId");
+const db_1 = require("./db"); // Extracted MongoDB connection logic
 // Load environment variables from .env file
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
@@ -15,25 +15,13 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(express_1.default.json());
 app.use(logTenantId_1.logTenantId);
-// MongoDB Atlas connection URI
-// MongoDB Atlas connection URI from environment variables
-const uri = process.env.MONGODB_URI || '';
-// Check if the URI is provided
-if (!uri) {
-    console.error('MongoDB URI is not set in environment variables');
-    process.exit(1); // Exit the process if the URI is not set
-}
-// Connect to MongoDB Atlas using Mongoose
-mongoose_1.default.connect(uri)
-    .then(() => {
-    console.log('Connected to MongoDB Atlas');
-})
-    .catch((err) => {
-    console.error('Error connecting to MongoDB Atlas', err);
-    process.exit(1); // Optionally exit the process if the connection fails
-});
+(0, db_1.connectToMongoDB)();
 // Routes
 app.use('/api', articleRoutes_1.default);
+// Health Check Route
+app.get('/health', (req, res) => {
+    res.status(200).send('Service is up and running!');
+});
 // Global Error Handling Middleware
 app.use((err, req, res, next) => {
     if (process.env.NODE_ENV === 'production') {

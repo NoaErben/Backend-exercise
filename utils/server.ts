@@ -1,9 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import { config } from 'dotenv';
-import articleRoutes from './routes/articleRoutes';
-import { logTenantId } from './middleware/logTenantId';
-import { connectToMongoDB } from './utils/db'; // Extracted MongoDB connection logic
+import articleRoutes from '../routes/articleRoutes';
+import { logTenantId } from '../middleware/logTenantId';
+import { connectToMongoDB } from './db'; // Extracted MongoDB connection logic
 
 
 // Load environment variables from .env file
