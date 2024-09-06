@@ -9,7 +9,6 @@ export const createArticle = async (req: Request, res: Response, next: NextFunct
         const { author, text } = req.body;
         await articleService.createArticle(author, text);
 
-        // Send a plain text message upon successful save
         res.status(201).send('Article saved successfully');
     } catch (error) {
         if (error instanceof Error) {

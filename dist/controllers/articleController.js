@@ -17,7 +17,6 @@ const createArticle = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     try {
         const { author, text } = req.body;
         yield articleService.createArticle(author, text);
-        // Send a plain text message upon successful save
         res.status(201).send('Article saved successfully');
     }
     catch (error) {

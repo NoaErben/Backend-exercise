@@ -24,7 +24,7 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(express_1.default.json());
 app.use(logTenantId_1.logTenantId);
-// Function to start the server
+// start the server
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Connect to MongoDB
@@ -55,4 +55,4 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 // Start the server
-startServer();
+void startServer();

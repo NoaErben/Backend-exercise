@@ -10,5 +10,6 @@ const router = express_1.default.Router();
 router.post('/articles', articleController_1.createArticle);
 // GET route for getting an article by ID
 router.get('/getById/:id', articleController_1.getArticleById);
+// GET route for searching articles by a word in the text
 router.get('/getByWord/:word', articleController_1.findWordsInArticles);
 exports.default = router;

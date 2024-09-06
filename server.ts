@@ -14,7 +14,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(logTenantId);
 
-// Function to start the server
+// start the server
 const startServer = async () => {
     try {
         // Connect to MongoDB
@@ -48,4 +48,4 @@ const startServer = async () => {
 };
 
 // Start the server
-startServer();
+void startServer();

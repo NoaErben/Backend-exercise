@@ -12,17 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArticleService = void 0;
 const article_1 = require("../models/article");
 class ArticleService {
-    // Create a new article (returns void)
+    // Create a new article
     createArticle(author, text) {
         return __awaiter(this, void 0, void 0, function* () {
             const article = new article_1.Article({ author, text });
-            yield article.save(); // No need to return the article
+            yield article.save();
         });
     }
     // Get an article by its ID
     getArticleById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield article_1.Article.findById(id);
+            return article_1.Article.findById(id);
         });
     }
     // Search for a word in articles and return word offsets

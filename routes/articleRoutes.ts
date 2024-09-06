@@ -9,6 +9,7 @@ router.post('/articles', createArticle);
 // GET route for getting an article by ID
 router.get('/getById/:id', getArticleById);
 
+// GET route for searching articles by a word in the text
 router.get('/getByWord/:word', findWordsInArticles)
 
 export default router;

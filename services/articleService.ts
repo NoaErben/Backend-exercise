@@ -6,15 +6,15 @@ import mongoose, { FilterQuery, HydratedDocument } from 'mongoose';
 type ArticleWithId = HydratedDocument<IArticle>;
 
 export class ArticleService {
-    // Create a new article (returns void)
+    // Create a new article
     async createArticle(author: string, text: string): Promise<void> {
         const article = new Article({ author, text });
-        await article.save(); // No need to return the article
+        await article.save();
     }
 
     // Get an article by its ID
     async getArticleById(id: string): Promise<IArticle | null> {
-        return await Article.findById(id);
+        return Article.findById(id);
     }
 
     // Search for a word in articles and return word offsets
