@@ -43,7 +43,6 @@ const findWordsInArticles = (req, res) => __awaiter(void 0, void 0, void 0, func
         const keyword = req.params.word;
         const regex = new RegExp(keyword, 'g');
         const query = { text: { $regex: regex } };
-        // Perform the query with the correct type
         const articles = yield article_1.Article.find(query).exec();
         if (!articles || !Array.isArray(articles)) {
             res.status(500).send('Unexpected error: articles is not an array');
@@ -52,13 +51,12 @@ const findWordsInArticles = (req, res) => __awaiter(void 0, void 0, void 0, func
         const results = articles.map(article => {
             const offsets = [];
             let match;
-            // **Type narrowing** to ensure article.text is a string
+            // Type narrowing to ensure article.text is a string
             const text = article.text;
             // Find all occurrences of the word in the article's text
             while ((match = regex.exec(text)) !== null) {
                 offsets.push(match.index);
             }
-            // Return a JSON object with article_id and offsets
             return {
                 article_id: article._id.toString(),
                 offsets: offsets

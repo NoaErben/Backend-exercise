@@ -4,7 +4,7 @@ exports.logTenantId = logTenantId;
 function logTenantId(req, res, next) {
     const tenantId = req.headers['tenantid'];
     if (tenantId) {
-        console.log(`Received request for TENANT_ID: ${tenantId}`);
+        console.log(`Got an HTTP request for ${tenantId}`);
     }
     else {
         console.warn('No TENANT_ID header found in the request');
