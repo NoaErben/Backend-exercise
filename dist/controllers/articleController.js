@@ -10,62 +10,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findWordsInArticles = exports.getArticleById = exports.createArticle = void 0;
-const article_1 = require("../models/article");
-// Create a new article
-const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const articleService_1 = require("../services/articleService");
+const articleService = new articleService_1.ArticleService();
+// Controller to create an article
+const createArticle = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newArticle = new article_1.Article(req.body);
-        yield newArticle.save();
-        res.status(201).send("Article saved successfully");
+        const { author, text } = req.body;
+        yield articleService.createArticle(author, text);
+        // Send a plain text message upon successful save
+        res.status(201).send('Article saved successfully');
     }
     catch (error) {
-        res.status(500).send(`Error: ${error}`);
+        if (error instanceof Error) {
+            res.status(500).send(`Error: ${error.message}`);
+        }
+        else {
+            res.status(500).send('An unexpected error occurred.');
+        }
     }
 });
 exports.createArticle = createArticle;
-// Get an article by ID
-const getArticleById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Controller to get an article by ID
+const getArticleById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const article = yield article_1.Article.findById(req.params.id);
+        const articleId = req.params.id;
+        const article = yield articleService.getArticleById(articleId);
         if (!article) {
             return res.status(404).json({ message: 'Article not found' });
         }
         res.status(200).json(article);
     }
     catch (error) {
-        res.status(500).json({ message: 'Failed to retrieve article', error });
+        next(error); // Pass error to error-handling middleware
     }
 });
 exports.getArticleById = getArticleById;
-// Find words in articles
-const findWordsInArticles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Controller to search for words in articles
+const findWordsInArticles = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const keyword = req.params.word;
-        const regex = new RegExp(keyword, 'g');
-        const query = { text: { $regex: regex } };
-        const articles = yield article_1.Article.find(query).exec();
-        if (!articles || !Array.isArray(articles)) {
-            res.status(500).send('Unexpected error: articles is not an array');
-            return;
-        }
-        const results = articles.map(article => {
-            const offsets = [];
-            let match;
-            // Type narrowing to ensure article.text is a string
-            const text = article.text;
-            // Find all occurrences of the word in the article's text
-            while ((match = regex.exec(text)) !== null) {
-                offsets.push(match.index);
-            }
-            return {
-                article_id: article._id.toString(),
-                offsets: offsets
-            };
-        });
-        res.status(200).json(results);
+        const word = req.params.word;
+        const result = yield articleService.searchWordInArticles(word);
+        res.status(200).json(result);
     }
     catch (error) {
-        res.status(500).json({ message: 'Error retrieving articles', error });
+        next(error); // Pass error to error-handling middleware
     }
 });
 exports.findWordsInArticles = findWordsInArticles;
