@@ -25,8 +25,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Article = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+// Define the schema without manual typing
 const ArticleSchema = new mongoose_1.Schema({
     author: { type: String, required: true },
     text: { type: String, required: true },
 });
+// Correctly typing the Model without passing a type argument to mongoose.model
 exports.Article = mongoose_1.default.model('Article', ArticleSchema);

@@ -1,23 +1,25 @@
 import { Request, Response } from 'express';
-import { Article , IArticle } from '../models/article';
-import mongoose, {Document, FilterQuery} from 'mongoose';
+import {Article, IArticle} from '../models/article';
+import mongoose, { FilterQuery } from 'mongoose';
 
+// extends IArticle with all the properties of Document
+type ArticleWithId = mongoose.HydratedDocument<IArticle>;
 
 // Create a new article
 export const createArticle = async (req: Request, res: Response) => {
     try {
         const newArticle = new Article(req.body);
         await newArticle.save();
-        res.status(201).send("article saved successfully");
+        res.status(201).send("Article saved successfully");
     } catch (error) {
-        res.send(`error: ${error}`);
+        res.status(500).send(`Error: ${error}`);
     }
 };
 
 // Get an article by ID
 export const getArticleById = async (req: Request, res: Response) => {
     try {
-        const article = await Article.findById(req.params.id) as IArticle | null;
+        const article = await Article.findById(req.params.id) as ArticleWithId | null;
         if (!article) {
             return res.status(404).json({ message: 'Article not found' });
         }
@@ -30,13 +32,12 @@ export const getArticleById = async (req: Request, res: Response) => {
 // Find words in articles
 export const findWordsInArticles = async (req: Request, res: Response) => {
     try {
-        const keyword  = req.params.word;
-        const regex = new RegExp(keyword , 'g');
+        const keyword = req.params.word;
+        const regex = new RegExp(keyword, 'g');
 
         const query: FilterQuery<IArticle> = { text: { $regex: regex } };
 
-        // Perform the query with the correct type
-        const articles = await Article.find(query).exec() as IArticle[];
+        const articles = await Article.find(query).exec() as ArticleWithId[];
 
         if (!articles || !Array.isArray(articles)) {
             res.status(500).send('Unexpected error: articles is not an array');
@@ -47,16 +48,16 @@ export const findWordsInArticles = async (req: Request, res: Response) => {
             const offsets: number[] = [];
             let match: RegExpExecArray | null;
 
+            // Type narrowing to ensure article.text is a string
+            const text = article.text as string;
+
             // Find all occurrences of the word in the article's text
-            while ((match = regex.exec(article.text)) !== null) {
+            while ((match = regex.exec(text)) !== null) {
                 offsets.push(match.index);
             }
 
-            // return `{article_id: ${(article._id as mongoose.Types.ObjectId).toString()}, offsets:[${offsets.join(', ')}]}`;
-
-            // Return a JSON object
             return {
-                article_id: (article._id as mongoose.Types.ObjectId).toString(),
+                article_id: article._id.toString(),
                 offsets: offsets
             };
         });

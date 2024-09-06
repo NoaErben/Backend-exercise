@@ -1,16 +1,13 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Model } from 'mongoose';
 
-export interface IArticle extends Document {
-    // _id: mongoose.Types.ObjectId;
-    author: string;
-    text: string;
-}
-
-const ArticleSchema: Schema = new Schema({
+// Define the schema without manual typing
+const ArticleSchema = new Schema({
     author: { type: String, required: true },
     text: { type: String, required: true },
 });
 
-export const Article = mongoose.model<IArticle>('Article', ArticleSchema);
+// Infer the type from the schema automatically
+export type IArticle = mongoose.InferSchemaType<typeof ArticleSchema>;
 
-
+// Correctly typing the Model without passing a type argument to mongoose.model
+export const Article: Model<IArticle> = mongoose.model('Article', ArticleSchema);

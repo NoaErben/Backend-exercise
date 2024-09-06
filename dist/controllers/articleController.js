@@ -16,14 +16,14 @@ const createArticle = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const newArticle = new article_1.Article(req.body);
         yield newArticle.save();
-        res.status(201).send("article saved successfully");
+        res.status(201).send("Article saved successfully");
     }
     catch (error) {
-        res.send(`error: ${error}`);
+        res.status(500).send(`Error: ${error}`);
     }
 });
 exports.createArticle = createArticle;
-// Get an article by IDß
+// Get an article by ID
 const getArticleById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const article = yield article_1.Article.findById(req.params.id);
@@ -52,12 +52,13 @@ const findWordsInArticles = (req, res) => __awaiter(void 0, void 0, void 0, func
         const results = articles.map(article => {
             const offsets = [];
             let match;
+            // **Type narrowing** to ensure article.text is a string
+            const text = article.text;
             // Find all occurrences of the word in the article's text
-            while ((match = regex.exec(article.text)) !== null) {
+            while ((match = regex.exec(text)) !== null) {
                 offsets.push(match.index);
             }
-            // return `{article_id: ${(article._id as mongoose.Types.ObjectId).toString()}, offsets:[${offsets.join(', ')}]}`;
-            // Return a JSON object
+            // Return a JSON object with article_id and offsets
             return {
                 article_id: article._id.toString(),
                 offsets: offsets
