@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ArticleRepository } from '../repositories/articleRepository';
-import { HttpException } from '../middleware/HttpException';  // Import custom error class
+import { HttpException } from '../middleware/HttpException';
 import { FilterQuery } from 'mongoose';
 import { IArticle } from '../models/article';
 
@@ -11,7 +11,6 @@ export const createArticle = async (req: Request, res: Response, next: NextFunct
     try {
         const { author, text } = req.body;
         await articleRepository.createArticle(author, text);
-
         res.status(201).send('Article saved successfully');
     } catch (error) {
         next(new HttpException(500, error instanceof Error ? error.message : 'Unknown error occurred'));
@@ -38,8 +37,6 @@ export const findWordsInArticles = async (req: Request, res: Response, next: Nex
         const word = req.params.word;
         const regex = new RegExp(`\\b${word}\\b`, 'g');
         const query: FilterQuery<IArticle> = { text: { $regex: regex } };
-
-        // Call the repository to fetch articles containing the word
         const articles = await articleRepository.getArticleByQuery(query);
 
         // Handle the logic to map the articles and find word offsets

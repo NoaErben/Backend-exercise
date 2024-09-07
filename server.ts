@@ -5,7 +5,6 @@ import { logTenantId } from './middleware/logTenantId';
 import { connectToMongoDB } from './utils/db';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import { HttpException } from './middleware/HttpException';
-import healthcheck from 'express-healthcheck';
 
 // Load environment variables
 config();
@@ -37,7 +36,6 @@ const startServer = async () => {
         // Global error handler
         app.use(errorMiddleware);
 
-        // Start the server
         app.listen(port, () => {
             console.log(`Server running on port ${port}`);
         });

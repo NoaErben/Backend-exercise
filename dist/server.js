@@ -41,7 +41,6 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
         });
         // Global error handler
         app.use(errorMiddleware_1.errorMiddleware);
-        // Start the server
         app.listen(port, () => {
             console.log(`Server running on port ${port}`);
         });

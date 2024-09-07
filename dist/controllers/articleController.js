@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findWordsInArticles = exports.getArticleById = exports.createArticle = void 0;
 const articleRepository_1 = require("../repositories/articleRepository");
-const HttpException_1 = require("../middleware/HttpException"); // Import custom error class
+const HttpException_1 = require("../middleware/HttpException");
 const articleRepository = new articleRepository_1.ArticleRepository();
 // Controller to create an article
 const createArticle = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -46,7 +46,6 @@ const findWordsInArticles = (req, res, next) => __awaiter(void 0, void 0, void 0
         const word = req.params.word;
         const regex = new RegExp(`\\b${word}\\b`, 'g');
         const query = { text: { $regex: regex } };
-        // Call the repository to fetch articles containing the word
         const articles = yield articleRepository.getArticleByQuery(query);
         // Handle the logic to map the articles and find word offsets
         const result = articles.map(article => {

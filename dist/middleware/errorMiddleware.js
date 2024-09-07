@@ -2,15 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorMiddleware = void 0;
 // Global error handling middleware
-const errorMiddleware = (error, // The error object passed to middleware
-req, // Express Request object
-res, // Express Response object
-next // Express Next function (not used but required)
-) => {
+const errorMiddleware = (error, req, res, next) => {
     // Determine the status code and message
     const status = error.status || 500;
     const message = error.message || 'Internal Server Error';
-    // Log the error for debugging (can be integrated with external logging)
     console.error(`ERROR ${status}: ${message}`);
     // Create a response object
     const response = {
@@ -25,7 +20,6 @@ next // Express Next function (not used but required)
     if (process.env.NODE_ENV === 'production' && status === 500) {
         response.message = 'An internal error occurred.';
     }
-    // Send the error response to the client
     res.status(status).json(response);
 };
 exports.errorMiddleware = errorMiddleware;
