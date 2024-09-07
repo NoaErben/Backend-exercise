@@ -1,23 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
-import { ArticleRepository } from '../services/articleRepository';
+import { ArticleRepository } from '../repositories/articleRepository';
+import { HttpException } from '../middleware/HttpException';  // Import custom error class
 import { FilterQuery } from 'mongoose';
 import { IArticle } from '../models/article';
 
-const articleService = new ArticleRepository();
+const articleRepository = new ArticleRepository();
 
 // Controller to create an article
 export const createArticle = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { author, text } = req.body;
-        await articleService.createArticle(author, text);
+        await articleRepository.createArticle(author, text);
 
         res.status(201).send('Article saved successfully');
     } catch (error) {
-        if (error instanceof Error) {
-            res.status(500).send(`Error: ${error.message}`);
-        } else {
-            res.status(500).send('An unexpected error occurred.');
-        }
+        next(new HttpException(500, error instanceof Error ? error.message : 'Unknown error occurred'));
     }
 };
 
@@ -25,13 +22,13 @@ export const createArticle = async (req: Request, res: Response, next: NextFunct
 export const getArticleById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const articleId = req.params.id;
-        const article = await articleService.getArticleById(articleId);
+        const article = await articleRepository.getArticleById(articleId);
         if (!article) {
-            return res.status(404).json({ message: 'Article not found' });
+            return next(new HttpException(404, 'Article not found'));
         }
         res.status(200).json(article);
     } catch (error) {
-        next(error); // Pass error to error-handling middleware
+        next(new HttpException(500, error instanceof Error ? error.message : 'Unknown error occurred'));
     }
 };
 
@@ -39,17 +36,16 @@ export const getArticleById = async (req: Request, res: Response, next: NextFunc
 export const findWordsInArticles = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const word = req.params.word;
-        const regex = new RegExp(word, 'g');
+        const regex = new RegExp(`\\b${word}\\b`, 'g');
         const query: FilterQuery<IArticle> = { text: { $regex: regex } };
 
-        // Call the client to fetch articles containing the word
-        const articles = await articleService.getArticleByQuery(query);
+        // Call the repository to fetch articles containing the word
+        const articles = await articleRepository.getArticleByQuery(query);
 
-        // map the articles and find word offsets
+        // Handle the logic to map the articles and find word offsets
         const result = articles.map(article => {
             const offsets: number[] = [];
             let match: RegExpExecArray | null;
-
             const text = article.text as string;
 
             // Find all occurrences of the word and record their positions
@@ -65,6 +61,6 @@ export const findWordsInArticles = async (req: Request, res: Response, next: Nex
 
         res.status(200).json({ word, locations: result });
     } catch (error) {
-        next(error); // Pass error to error-handling middleware
+        next(new HttpException(500, error instanceof Error ? error.message : 'Unknown error occurred'));
     }
 };

@@ -17,35 +17,30 @@ const dotenv_1 = require("dotenv");
 const articleRoutes_1 = __importDefault(require("./routes/articleRoutes"));
 const logTenantId_1 = require("./middleware/logTenantId");
 const db_1 = require("./utils/db");
+const errorMiddleware_1 = require("./middleware/errorMiddleware");
+const HttpException_1 = require("./middleware/HttpException");
 // Load environment variables
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
-const port = 3000;
+const port = process.env.PORT || 3000;
 // Middleware
 app.use(express_1.default.json());
 app.use(logTenantId_1.logTenantId);
-// start the server
+// Start the server
 const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Connect to MongoDB
         yield (0, db_1.connectToMongoDB)();
         // API routes
         app.use('/api', articleRoutes_1.default);
-        // todo - check if necessary
-        // Health check route
-        app.get('/health', (req, res) => {
-            res.status(200).send('Service is up and running!');
+        // Health check route using express-healthcheck
+        app.use('/healthcheck', require('express-healthcheck')());
+        // Handle 404 errors for unrecognized routes
+        app.use((req, res, next) => {
+            next(new HttpException_1.HttpException(404, 'Route not found'));
         });
-        // todo - exception class
         // Global error handler
-        app.use((err, req, res, next) => {
-            if (process.env.NODE_ENV === 'production') {
-                res.status(500).send('An internal error occurred.'); //todo - expand the exception explanation
-            }
-            else {
-                res.status(500).send(`Error: ${err.message}\nStack: ${err.stack}`);
-            }
-        });
+        app.use(errorMiddleware_1.errorMiddleware);
         // Start the server
         app.listen(port, () => {
             console.log(`Server running on port ${port}`);

@@ -10,22 +10,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findWordsInArticles = exports.getArticleById = exports.createArticle = void 0;
-const articleClient_1 = require("../services/articleClient");
-const articleService = new articleClient_1.ArticleClient();
+const articleRepository_1 = require("../repositories/articleRepository");
+const HttpException_1 = require("../middleware/HttpException"); // Import custom error class
+const articleRepository = new articleRepository_1.ArticleRepository();
 // Controller to create an article
 const createArticle = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { author, text } = req.body;
-        yield articleService.createArticle(author, text);
+        yield articleRepository.createArticle(author, text);
         res.status(201).send('Article saved successfully');
     }
     catch (error) {
-        if (error instanceof Error) {
-            res.status(500).send(`Error: ${error.message}`);
-        }
-        else {
-            res.status(500).send('An unexpected error occurred.');
-        }
+        next(new HttpException_1.HttpException(500, error instanceof Error ? error.message : 'Unknown error occurred'));
     }
 });
 exports.createArticle = createArticle;
@@ -33,14 +29,14 @@ exports.createArticle = createArticle;
 const getArticleById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const articleId = req.params.id;
-        const article = yield articleService.getArticleById(articleId);
+        const article = yield articleRepository.getArticleById(articleId);
         if (!article) {
-            return res.status(404).json({ message: 'Article not found' });
+            return next(new HttpException_1.HttpException(404, 'Article not found'));
         }
         res.status(200).json(article);
     }
     catch (error) {
-        next(error); // Pass error to error-handling middleware
+        next(new HttpException_1.HttpException(500, error instanceof Error ? error.message : 'Unknown error occurred'));
     }
 });
 exports.getArticleById = getArticleById;
@@ -48,11 +44,11 @@ exports.getArticleById = getArticleById;
 const findWordsInArticles = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const word = req.params.word;
-        const regex = new RegExp(word, 'g');
+        const regex = new RegExp(`\\b${word}\\b`, 'g');
         const query = { text: { $regex: regex } };
-        // Call the client to fetch articles containing the word
-        const articles = yield articleService.getArticleByQuery(query);
-        // map the articles and find word offsets
+        // Call the repository to fetch articles containing the word
+        const articles = yield articleRepository.getArticleByQuery(query);
+        // Handle the logic to map the articles and find word offsets
         const result = articles.map(article => {
             const offsets = [];
             let match;
@@ -69,7 +65,7 @@ const findWordsInArticles = (req, res, next) => __awaiter(void 0, void 0, void 0
         res.status(200).json({ word, locations: result });
     }
     catch (error) {
-        next(error); // Pass error to error-handling middleware
+        next(new HttpException_1.HttpException(500, error instanceof Error ? error.message : 'Unknown error occurred'));
     }
 });
 exports.findWordsInArticles = findWordsInArticles;

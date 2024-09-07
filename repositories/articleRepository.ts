@@ -18,7 +18,7 @@ export class ArticleRepository {
     }
 
     // Get an article by its ID
-    async getArticleById(id: string): Promise<IArticle | null> {
+    getArticleById(id: string): Promise<IArticle | null> {
         return Article.findById(id);
     }
 
