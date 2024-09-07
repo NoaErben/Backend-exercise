@@ -20,7 +20,7 @@ const db_1 = require("./utils/db");
 // Load environment variables
 (0, dotenv_1.config)();
 const app = (0, express_1.default)();
-const port = process.env.PORT || 3000;
+const port = 3000;
 // Middleware
 app.use(express_1.default.json());
 app.use(logTenantId_1.logTenantId);
@@ -31,14 +31,16 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
         yield (0, db_1.connectToMongoDB)();
         // API routes
         app.use('/api', articleRoutes_1.default);
+        // todo - check if necessary
         // Health check route
         app.get('/health', (req, res) => {
             res.status(200).send('Service is up and running!');
         });
+        // todo - exception class
         // Global error handler
         app.use((err, req, res, next) => {
             if (process.env.NODE_ENV === 'production') {
-                res.status(500).send('An internal error occurred.');
+                res.status(500).send('An internal error occurred.'); //todo - expand the exception explanation
             }
             else {
                 res.status(500).send(`Error: ${err.message}\nStack: ${err.stack}`);

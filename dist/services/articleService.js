@@ -25,6 +25,10 @@ class ArticleService {
             return article_1.Article.findById(id);
         });
     }
+    // new
+    // async getArticle(query: FilterQuery<IArticle>) {
+    //     await Article.find(query).exec();
+    // }
     // Search for a word in articles and return word offsets
     searchWordInArticles(word) {
         return __awaiter(this, void 0, void 0, function* () {

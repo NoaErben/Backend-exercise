@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findWordsInArticles = exports.getArticleById = exports.createArticle = void 0;
-const articleService_1 = require("../services/articleService");
-const articleService = new articleService_1.ArticleService();
+const articleClient_1 = require("../services/articleClient");
+const articleService = new articleClient_1.ArticleClient();
 // Controller to create an article
 const createArticle = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -44,12 +44,29 @@ const getArticleById = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.getArticleById = getArticleById;
-// Controller to search for words in articles
+// Controller to search for words in articles and calculate word offsets
 const findWordsInArticles = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const word = req.params.word;
-        const result = yield articleService.searchWordInArticles(word);
-        res.status(200).json(result);
+        const regex = new RegExp(word, 'g');
+        const query = { text: { $regex: regex } };
+        // Call the client to fetch articles containing the word
+        const articles = yield articleService.getArticleByQuery(query);
+        // map the articles and find word offsets
+        const result = articles.map(article => {
+            const offsets = [];
+            let match;
+            const text = article.text;
+            // Find all occurrences of the word and record their positions
+            while ((match = regex.exec(text)) !== null) {
+                offsets.push(match.index);
+            }
+            return {
+                article_id: article._id.toString(),
+                offsets: offsets
+            };
+        });
+        res.status(200).json({ word, locations: result });
     }
     catch (error) {
         next(error); // Pass error to error-handling middleware

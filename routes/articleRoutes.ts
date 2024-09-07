@@ -10,6 +10,6 @@ router.post('/articles', createArticle);
 router.get('/getById/:id', getArticleById);
 
 // GET route for searching articles by a word in the text
-router.get('/getByWord/:word', findWordsInArticles)
+router.get('/getByWord/:word', findWordsInArticles);
 
 export default router;

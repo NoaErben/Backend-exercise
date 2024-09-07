@@ -8,7 +8,7 @@ import { connectToMongoDB } from './utils/db';
 config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
 // Middleware
 app.use(express.json());
@@ -23,15 +23,17 @@ const startServer = async () => {
         // API routes
         app.use('/api', articleRoutes);
 
+        // todo - check if necessary
         // Health check route
         app.get('/health', (req: Request, res: Response) => {
             res.status(200).send('Service is up and running!');
         });
 
+        // todo - exception class
         // Global error handler
         app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
             if (process.env.NODE_ENV === 'production') {
-                res.status(500).send('An internal error occurred.');
+                res.status(500).send('An internal error occurred.'); //todo - expand the exception explanation
             } else {
                 res.status(500).send(`Error: ${err.message}\nStack: ${err.stack}`);
             }
